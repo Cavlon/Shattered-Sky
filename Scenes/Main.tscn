@@ -1,0 +1,61 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://Scenes/CameraHolder.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Materials/mat_gridDark.tres" type="Material" id=3]
+[ext_resource path="res://Scenes/PlayerRB.tscn" type="PackedScene" id=4]
+
+[node name="World" type="Spatial"]
+
+[node name="DirectionalLight" type="DirectionalLight" parent="."]
+transform = Transform( 0.490428, -0.424367, 0.761179, -0.0125235, 0.869909, 0.493054, -0.871392, -0.25134, 0.421313, 9.03358, 7.21479, 7.04271 )
+
+[node name="CSGCombiner" type="CSGCombiner" parent="."]
+use_collision = true
+
+[node name="CSGBox" type="CSGBox" parent="CSGCombiner"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.454823, 0 )
+width = 112.029
+height = 0.002
+depth = 116.288
+material = ExtResource( 3 )
+
+[node name="CSGPolygon" type="CSGPolygon" parent="CSGCombiner"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 5.12657, -0.602202, 0 )
+polygon = PoolVector2Array( 0, 0, 0.00577927, 0.0932208, 5.03424, 2.02012, 5.04448, -0.00594586 )
+material = ExtResource( 3 )
+
+[node name="CSGPolygon2" type="CSGPolygon" parent="CSGCombiner"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 5.12657, -0.639984, -4.08657 )
+polygon = PoolVector2Array( 0, 0, 0.00577927, 0.0932208, 4.86549, 9.8591, 5.04448, -0.00594586 )
+material = ExtResource( 3 )
+
+[node name="CSGBox2" type="CSGBox" parent="CSGCombiner"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 12.8121, 7.50658, 38.5193 )
+width = 78.4987
+height = 16.7459
+depth = 0.380814
+material = ExtResource( 3 )
+
+[node name="CSGBox3" type="CSGBox" parent="CSGCombiner"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -7.44948, 7.50658, 28.4696 )
+width = 78.4987
+height = 16.7459
+depth = 0.380814
+material = ExtResource( 3 )
+
+[node name="CameraHolder" parent="." instance=ExtResource( 1 )]
+headPath = NodePath("../PlayerRB/Head")
+
+[node name="Camera" parent="CameraHolder" index="0"]
+fov = 120.0
+
+[node name="PlayerRB" parent="." instance=ExtResource( 4 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -9.53674e-07, 6.63076, 21.7138 )
+contacts_reported = 1
+contact_monitor = true
+axis_lock_angular_x = true
+axis_lock_angular_z = true
+camHolderPath = NodePath("../CameraHolder")
+
+[editable path="CameraHolder"]
+[editable path="PlayerRB"]

@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://Scripts/scr_MoveCam.cs" type="Script" id=1]
+
+[node name="CameraHolder" type="Spatial"]
+script = ExtResource( 1 )
+headPath = NodePath("../Player/Head")
+
+[node name="Camera" type="Camera" parent="."]
+keep_aspect = 0
+fov = 90.0
