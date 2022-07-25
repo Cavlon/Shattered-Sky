@@ -5,14 +5,11 @@ public class scr_PlayerRB : RigidBody
 {
     [Header("Movement")]
     [Export] private float speed;
-    [Export] private float hAcceleration;
-    [Export] private float gravity;
+    [Export] private float maxSpeed;
     [Export] private float jumpForce;
+    [Export] private float counterMovement;
 
-    private Vector3 dir;
-    private Vector3 velocity;
-    private Vector3 movement;
-    private Vector3 gravVec;
+    private float threshold = 0.01f;
     private bool groundContact;
     private RayCast groundCheck;
 
@@ -67,6 +64,15 @@ public class scr_PlayerRB : RigidBody
         ProcessInput(delta);      
     }
 
+    public override void _IntegrateForces(PhysicsDirectBodyState state)
+    {
+        if (Mathf.Sqrt(Mathf.Pow(LinearVelocity.x, 2) + Mathf.Pow(LinearVelocity.z, 2)) > maxSpeed && groundContact){
+            float yVel = LinearVelocity.y;
+            Vector3 velNormalised = LinearVelocity.Normalized() * maxSpeed;
+            LinearVelocity = new Vector3(velNormalised.x, yVel, velNormalised.z);
+        }
+    }
+
     private void ProcessInput(float delta){
         // If escape is pressed, cursor between being hidden and locked to visible and free
         if (Input.IsActionJustPressed("ui_cancel"))
@@ -98,12 +104,6 @@ public class scr_PlayerRB : RigidBody
         bool canWallRun = !minJumpHeightCheck.IsColliding();
         wallLeft = leftWallCheck.IsColliding();
         wallRight = rightWallCheck.IsColliding();
-
-        if (wallLeft){
-            GD.Print("wall left");
-        } else if (wallRight){
-            GD.Print("wall right");
-        }
         
         //Checks if the player is high enough and close enough to a wall to wallrun
         if (canWallRun){
@@ -138,40 +138,51 @@ public class scr_PlayerRB : RigidBody
     }
 
     private void Move(float delta){
-        dir = Vector3.Zero;
-
         groundContact = groundCheck.IsColliding();
 
-        float speedMultiplierX = 1f;
-        float speedMultiplierZ = 1f;
+        Vector2 mag = FindVelRelativeToLook();
+
+        Vector2 moveInput = Input.GetVector("move_left", "move_right", "move_forward", "move_back");
 
         if (Input.IsActionJustPressed("jump") && groundContact){
             AddCentralForce(Vector3.Up * jumpForce * 1.5f);
         }
 
-        if (Input.IsActionPressed("move_forward")){
-            dir -= head.Transform.basis.z;
-        } else if (Input.IsActionPressed("move_back")){
-            dir += head.Transform.basis.z;
-        }
+        CounterMovement(moveInput, mag, delta);
 
-        if (Input.IsActionPressed("move_left")){
-            dir -= head.GlobalTransform.basis.x;
-        } else if (Input.IsActionPressed("move_right")){
-            dir += head.GlobalTransform.basis.x;
-        }
+        if (moveInput.x > 0 && mag.x > maxSpeed) moveInput.x = 0;
+        if (moveInput.x < 0 && mag.x < -maxSpeed) moveInput.x = 0;
+        if (moveInput.y > 0 && mag.y > maxSpeed) moveInput.y = 0;
+        if (moveInput.y < 0 && mag.y < -maxSpeed) moveInput.y = 0;
 
-        velocity.x = Mathf.Lerp(velocity.x, dir.x*speed, hAcceleration * delta);
-        velocity.z = Mathf.Lerp(velocity.z, dir.z*speed, hAcceleration * delta);
+        float speedMultiplierX = 1f;
+        float speedMultiplierZ = 1f;
 
         if (!groundContact){
             speedMultiplierX = 0.65f;
             speedMultiplierZ = 0.5f;
         }
-
-        dir = dir.Normalized();
         
-        AddCentralForce(velocity);
+        AddCentralForce(head.GlobalTransform.basis.z * moveInput.y * speed * delta * speedMultiplierZ);
+        AddCentralForce(head.GlobalTransform.basis.x * moveInput.x * speed * delta * speedMultiplierX);
+
+    }
+
+    private void Jump(){
+
+    }
+
+    private void CounterMovement(Vector2 input, Vector2 mag, float delta){
+        if (!groundContact) return;
+
+        GD.Print(mag);
+
+        if (Mathf.Abs(mag.x) > threshold && Mathf.Abs(input.x) < 0.05f || (mag.x < -threshold && input.x > 0) || (mag.x > threshold && input.x < 0)){
+            AddCentralForce(head.GlobalTransform.basis.x * speed * -mag.x * delta * counterMovement);
+        }
+        if (Mathf.Abs(mag.y) > threshold && Mathf.Abs(input.y) < 0.05f || (mag.y < -threshold && input.y < 0) || (mag.y > threshold && input.y > 0)){
+            AddCentralForce(head.GlobalTransform.basis.z * speed * mag.y * delta * counterMovement);
+        }
     }
 
     private void Look(){
@@ -197,6 +208,18 @@ public class scr_PlayerRB : RigidBody
                
         simulatedY = Mathf.Clamp(simulatedY, Mathf.Deg2Rad(-89.5f), Mathf.Deg2Rad(89.5f));
 
+        float simulatedXDeg = Mathf.Rad2Deg(simulatedX);
+
+        if (simulatedXDeg > 180){
+            simulatedXDeg = -180 + (simulatedXDeg - 180);
+            simulatedX = Mathf.Deg2Rad(simulatedXDeg);
+        }
+        if (simulatedXDeg < -180){
+            simulatedXDeg = 180 + (simulatedXDeg + 180);
+            simulatedX = Mathf.Deg2Rad(simulatedXDeg);
+        }
+
+
         Vector3 rot = cameraHolder.Rotation;
         rot.y = simulatedX;
         rot.x = simulatedY;
@@ -206,5 +229,31 @@ public class scr_PlayerRB : RigidBody
         rot.x = 0;
         rot.z = 0;
         head.Rotation = rot;
+    }
+
+    private Vector2 FindVelRelativeToLook(){
+        float lookAngle = -(Mathf.Rad2Deg(head.Rotation.y));
+        float moveAngle = Mathf.Rad2Deg(Mathf.Atan2(LinearVelocity.x, -LinearVelocity.z));
+
+        float u = -DeltaAngle(lookAngle, moveAngle);
+        float v = 90 - u;
+
+        // GD.Print(u);
+
+        float magnitude = LinearVelocity.Length();
+        float yMag = magnitude * Mathf.Cos(Mathf.Deg2Rad(u));
+        float xMag = magnitude * Mathf.Cos(Mathf.Deg2Rad(v));
+
+        return new Vector2(xMag, yMag);
+    }
+
+    private float DeltaAngle(float angle1, float angle2){
+        float angle = angle1 - angle2 % 360;
+
+        if (angle > 180){
+            angle = 360 - angle;
+        }
+
+        return angle;
     }
 }

@@ -51,10 +51,13 @@ fov = 120.0
 
 [node name="PlayerRB" parent="." instance=ExtResource( 4 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -9.53674e-07, 6.63076, 21.7138 )
+collision_layer = 2
+mode = 2
 contacts_reported = 1
 contact_monitor = true
-axis_lock_angular_x = true
-axis_lock_angular_z = true
+speed = 1000.0
+maxSpeed = 20.0
+counterMovement = 0.1
 camHolderPath = NodePath("../CameraHolder")
 
 [editable path="CameraHolder"]
