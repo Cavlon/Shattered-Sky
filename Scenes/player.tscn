@@ -1,56 +1,54 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=5 format=2]
 
-[ext_resource path="res://Scripts/scr_Player.cs" type="Script" id=1]
+[ext_resource path="res://scripts/Player.cs" type="Script" id=1]
 
-[sub_resource type="CapsuleShape" id=1]
-radius = 0.2
-height = 0.8
+[sub_resource type="CapsuleMesh" id=1]
+mid_height = 3.0
 
-[sub_resource type="CapsuleMesh" id=2]
-radius = 0.2
-mid_height = 0.8
+[sub_resource type="CapsuleShape" id=2]
+height = 3.0
+
+[sub_resource type="CylinderShape" id=3]
 
 [node name="Player" type="KinematicBody"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.60439, 0 )
 script = ExtResource( 1 )
-speed = 20.0
-hAcceleration = 2.0
-gravity = 25.0
-jumpForce = 15.0
-wallRunGravity = 15.0
-mouseSensitivity = 12.0
-fov = 120.0
-wallRunfov = 150.0
+fov = 100.0
+wallRunfov = 130.0
 wallRunfovTime = 10.0
 camTilt = 10.0
 camTiltTime = 10.0
 
-[node name="CollisionShape" type="CollisionShape" parent="."]
+[node name="MeshInstance" type="MeshInstance" parent="."]
 transform = Transform( 1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0 )
-shape = SubResource( 1 )
-
-[node name="MeshInstance" type="MeshInstance" parent="CollisionShape"]
-mesh = SubResource( 2 )
+mesh = SubResource( 1 )
 material/0 = null
 
+[node name="CollisionShape" type="CollisionShape" parent="."]
+transform = Transform( 1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0 )
+shape = SubResource( 2 )
+
+[node name="Foot" type="CollisionShape" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.6, 0 )
+shape = SubResource( 3 )
+
 [node name="Head" type="Spatial" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0 )
+
+[node name="Camera" type="Camera" parent="Head"]
+fov = 100.0
+near = 0.01
 
 [node name="Raycasts" type="Spatial" parent="."]
 
-[node name="GroundCheck" type="RayCast" parent="Raycasts"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.526911, 0 )
+[node name="WallRight" type="RayCast" parent="Raycasts"]
 enabled = true
-cast_to = Vector3( 0, -0.15, 0 )
+cast_to = Vector3( 1.8, 0, 0 )
 
-[node name="LWallCheck" type="RayCast" parent="Raycasts"]
+[node name="WallLeft" type="RayCast" parent="Raycasts"]
 enabled = true
-cast_to = Vector3( -0.4, 0, 0 )
+cast_to = Vector3( -1.8, 0, 0 )
 
-[node name="RWallCheck" type="RayCast" parent="Raycasts"]
+[node name="MinJump" type="RayCast" parent="Raycasts"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2.36858, 0 )
 enabled = true
-cast_to = Vector3( 0.4, 0, 0 )
-
-[node name="MinJumpCheck" type="RayCast" parent="Raycasts"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.54859, 0 )
-enabled = true
-cast_to = Vector3( 0, -0.65, 0 )
+cast_to = Vector3( 0, -2, 0 )

@@ -75,7 +75,7 @@ public class scr_Player : KinematicBody
                 Input.SetMouseMode(Input.MouseMode.Captured);
             else
                 Input.SetMouseMode(Input.MouseMode.Visible);
-        }       
+        }        
 
         Move(delta);
     }
@@ -202,6 +202,17 @@ public class scr_Player : KinematicBody
         yRot = xRot = 0;
                
         simulatedY = Mathf.Clamp(simulatedY, Mathf.Deg2Rad(-89.5f), Mathf.Deg2Rad(89.5f));
+
+        float simulatedXDeg = Mathf.Rad2Deg(simulatedX);
+
+        if (simulatedXDeg > 180){
+            simulatedXDeg = -180 + (simulatedXDeg - 180);
+            simulatedX = Mathf.Deg2Rad(simulatedXDeg);
+        }
+        if (simulatedXDeg < -180){
+            simulatedXDeg = 180 + (simulatedXDeg + 180);
+            simulatedX = Mathf.Deg2Rad(simulatedXDeg);
+        }
 
         Vector3 rot = cameraHolder.Rotation;
         rot.y = simulatedX;

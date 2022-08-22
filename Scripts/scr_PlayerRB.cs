@@ -8,10 +8,14 @@ public class scr_PlayerRB : RigidBody
     [Export] private float maxSpeed;
     [Export] private float jumpForce;
     [Export] private float counterMovement;
+    [Export] private float gravity;
 
     private float threshold = 0.01f;
     private bool groundContact;
     private RayCast groundCheck;
+    private Node ground;
+
+    private PhysicsDirectBodyState bodyState;
 
     [Header("WallRun")]
     [Export] float wallRunJumpForce;
@@ -23,6 +27,7 @@ public class scr_PlayerRB : RigidBody
     private bool wallRunning;
     private bool wallLeft;
     private bool wallRight;
+    private Vector3 normVec;
 
     [Header("Camera")]
     [Export] private float mouseSensitivity;
@@ -51,6 +56,7 @@ public class scr_PlayerRB : RigidBody
         rightWallCheck = raycasts.GetNode<RayCast>("RWallCheck");
         minJumpHeightCheck = raycasts.GetNode<RayCast>("MinJumpCheck");
         head = GetNode<Spatial>("Head");
+        Connect("body_entered", this, "OnBodyEntered");
     }
 
     public override void _Process(float delta)
@@ -61,7 +67,7 @@ public class scr_PlayerRB : RigidBody
 
     public override void _PhysicsProcess(float delta)
     {
-        ProcessInput(delta);      
+        ProcessInput(delta);
     }
 
     public override void _IntegrateForces(PhysicsDirectBodyState state)
@@ -71,6 +77,8 @@ public class scr_PlayerRB : RigidBody
             Vector3 velNormalised = LinearVelocity.Normalized() * maxSpeed;
             LinearVelocity = new Vector3(velNormalised.x, yVel, velNormalised.z);
         }
+
+        bodyState = state;
     }
 
     private void ProcessInput(float delta){
@@ -138,16 +146,27 @@ public class scr_PlayerRB : RigidBody
     }
 
     private void Move(float delta){
-        groundContact = groundCheck.IsColliding();
+        
+        AddCentralForce(Vector3.Down * delta * gravity); 
+
+        if (groundCheck.GetCollider() != null){
+            ground = (Node)groundCheck.GetCollider(); 
+        } 
+
+        if (groundCheck.IsColliding() == false){
+            groundContact = false;
+        }
+
+        GD.Print(groundContact);
 
         Vector2 mag = FindVelRelativeToLook();
 
         Vector2 moveInput = Input.GetVector("move_left", "move_right", "move_forward", "move_back");
 
         if (Input.IsActionJustPressed("jump") && groundContact){
-            AddCentralForce(Vector3.Up * jumpForce * 1.5f);
+            ApplyCentralImpulse(Vector3.Up * delta * jumpForce);
         }
-
+        
         CounterMovement(moveInput, mag, delta);
 
         if (moveInput.x > 0 && mag.x > maxSpeed) moveInput.x = 0;
@@ -175,8 +194,6 @@ public class scr_PlayerRB : RigidBody
     private void CounterMovement(Vector2 input, Vector2 mag, float delta){
         if (!groundContact) return;
 
-        GD.Print(mag);
-
         if (Mathf.Abs(mag.x) > threshold && Mathf.Abs(input.x) < 0.05f || (mag.x < -threshold && input.x > 0) || (mag.x > threshold && input.x < 0)){
             AddCentralForce(head.GlobalTransform.basis.x * speed * -mag.x * delta * counterMovement);
         }
@@ -185,22 +202,14 @@ public class scr_PlayerRB : RigidBody
         }
     }
 
+    private void OnBodyEntered(Node body){
+        normVec = bodyState.GetContactLocalNormal(0);
+        if (body == ground){
+            groundContact = true;
+        }
+    }
+
     private void Look(){
-        // float yRot = Mathf.Deg2Rad(-mouseEvent.Relative.y * mouseSensitivity);
-        // float xRot = Mathf.Deg2Rad(-mouseEvent.Relative.x * mouseSensitivity);
-
-        // float simulatedY = cameraHolder.Rotation.x + yRot;
-               
-        // // Clamps the camera's vertical rotation
-        // if (simulatedY < Mathf.Pi / 2 && simulatedY > -(Mathf.Pi / 2)){
-        //     cameraHolder.RotateObjectLocal(Vector3.Right, yRot);
-        // }    
-
-        // cameraHolder.RotateY(xRot);
-        // RotateY(xRot);   
-            
-        // Transform = Transform.Orthonormalized();       
-
         float simulatedY = cameraHolder.Rotation.x + yRot;
         float simulatedX = cameraHolder.Rotation.y + xRot;
 
@@ -235,10 +244,8 @@ public class scr_PlayerRB : RigidBody
         float lookAngle = -(Mathf.Rad2Deg(head.Rotation.y));
         float moveAngle = Mathf.Rad2Deg(Mathf.Atan2(LinearVelocity.x, -LinearVelocity.z));
 
-        float u = -DeltaAngle(lookAngle, moveAngle);
+        float u = DeltaAngle(lookAngle, moveAngle);
         float v = 90 - u;
-
-        // GD.Print(u);
 
         float magnitude = LinearVelocity.Length();
         float yMag = magnitude * Mathf.Cos(Mathf.Deg2Rad(u));
@@ -248,10 +255,13 @@ public class scr_PlayerRB : RigidBody
     }
 
     private float DeltaAngle(float angle1, float angle2){
-        float angle = angle1 - angle2 % 360;
+        float angle = (angle2 - angle1) % 360;
 
         if (angle > 180){
-            angle = 360 - angle;
+            angle = angle - 360;
+        }
+        if (angle < -180){
+            angle = 360 + angle;
         }
 
         return angle;

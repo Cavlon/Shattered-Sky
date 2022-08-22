@@ -8,4 +8,4 @@ headPath = NodePath("../Player/Head")
 
 [node name="Camera" type="Camera" parent="."]
 keep_aspect = 0
-fov = 90.0
+fov = 120.0
