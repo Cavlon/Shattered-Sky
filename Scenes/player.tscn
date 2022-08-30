@@ -1,40 +1,83 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=7 format=2]
 
-[ext_resource path="res://scripts/Player.cs" type="Script" id=1]
+[ext_resource path="res://Scripts/scr_Player.cs" type="Script" id=1]
+[ext_resource path="res://Scenes/Pistol.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Scripts/scr_WeaponHolder.cs" type="Script" id=3]
 
 [sub_resource type="CapsuleMesh" id=1]
-mid_height = 3.0
+mid_height = 4.0
 
 [sub_resource type="CapsuleShape" id=2]
-height = 3.0
+resource_name = "Balls"
+margin = 0.001
+height = 4.0
 
 [sub_resource type="CylinderShape" id=3]
 
 [node name="Player" type="KinematicBody"]
+collision_layer = 2
+collision_mask = 3
 script = ExtResource( 1 )
-fov = 100.0
-wallRunfov = 130.0
-wallRunfovTime = 10.0
-camTilt = 10.0
-camTiltTime = 10.0
+speed = 50.0
+maxSpeed = 120.0
+gravity = 35.0
+jumpForce = 15.0
+normalAccel = 3.0
+airAccel = 0.25
+dashForce = 30.0
+wallRunGrav = 20.0
+basefov = 90.0
+additionalfov = 30.0
+fovChangeRate = 8.0
+camTilt = 15.0
+highSpeedfov = 105.0
+gforceLevel1 = 50.0
+gforceLevel2 = 125.0
+gforceMax = 200.0
+gforceGain = 6.0
 
-[node name="MeshInstance" type="MeshInstance" parent="."]
+[node name="PlayerMesh" type="MeshInstance" parent="."]
 transform = Transform( 1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0 )
 mesh = SubResource( 1 )
 material/0 = null
 
-[node name="CollisionShape" type="CollisionShape" parent="."]
+[node name="PlayerCollider" type="CollisionShape" parent="."]
 transform = Transform( 1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0 )
 shape = SubResource( 2 )
 
 [node name="Foot" type="CollisionShape" parent="."]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.6, 0 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2.01515, 0 )
 shape = SubResource( 3 )
 
 [node name="Head" type="Spatial" parent="."]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.1, -0.617 )
 
 [node name="Camera" type="Camera" parent="Head"]
+cull_mask = 1048573
+fov = 100.0
+near = 0.01
+far = 1000.0
+
+[node name="WeaponHolder" type="Spatial" parent="Head/Camera"]
+transform = Transform( -4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 0.578, -0.406, -0.498 )
+script = ExtResource( 3 )
+swayThreshold = 0.1
+
+[node name="Pistol" parent="Head/Camera/WeaponHolder" instance=ExtResource( 2 )]
+
+[node name="ViewportContainer" type="ViewportContainer" parent="Head/Camera"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Viewport" type="Viewport" parent="Head/Camera/ViewportContainer"]
+size = Vector2( 1920, 1080 )
+transparent_bg = true
+handle_input_locally = false
+render_target_update_mode = 3
+shadow_atlas_size = 1
+
+[node name="WeaponCamera" type="Camera" parent="Head/Camera/ViewportContainer/Viewport"]
+cull_mask = 2
 fov = 100.0
 near = 0.01
 
@@ -52,3 +95,8 @@ cast_to = Vector3( -1.8, 0, 0 )
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2.36858, 0 )
 enabled = true
 cast_to = Vector3( 0, -2, 0 )
+
+[node name="GroundCheck" type="RayCast" parent="Raycasts"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2.36858, 0 )
+enabled = true
+cast_to = Vector3( 0, -0.8, 0 )

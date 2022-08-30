@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/texture_06.png-9ab67bb235192786072a8df28cdc4da5.stex"
+path="res://.import/texture_06.png-18f8e9e1a8a63be211e0ee74bd33287e.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Textures/Grid/Orange/texture_06.png"
-dest_files=[ "res://.import/texture_06.png-9ab67bb235192786072a8df28cdc4da5.stex" ]
+source_file="res://textures/Grid/Orange/texture_06.png"
+dest_files=[ "res://.import/texture_06.png-18f8e9e1a8a63be211e0ee74bd33287e.stex" ]
 
 [params]
 

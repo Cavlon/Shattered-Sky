@@ -1,0 +1,77 @@
+// Game: Shattered Sky
+// Format: Standard
+// entity 0
+{
+"classname" "worldspawn"
+"_tb_textures" "textures;textures/Grid;textures/Grid/Dark;textures/Grid/Green;textures/Grid/Light;textures/Grid/Orange;textures/Grid/Purple;textures/Grid/Red"
+// brush 0
+{
+( -400 416 0 ) ( -400 -416 0 ) ( -400 -416 -4 ) Grid/Red/texture_12 0 0 0 1 1
+( -400 -416 0 ) ( 400 -416 0 ) ( 400 -416 -4 ) Grid/Red/texture_12 0 0 0 1 1
+( 400 -416 -4 ) ( 400 416 -4 ) ( -400 416 -4 ) Grid/Red/texture_12 0 0 0 1 1
+( -400 416 0 ) ( 400 416 0 ) ( 400 -416 0 ) Grid/Red/texture_12 0 0 0 1 1
+( 400 416 -4 ) ( 400 416 0 ) ( -400 416 0 ) Grid/Red/texture_12 0 0 0 1 1
+( 400 -416 0 ) ( 400 416 0 ) ( 400 416 -4 ) Grid/Red/texture_12 0 0 0 1 1
+}
+// brush 1
+{
+( -376 368 372 ) ( -376 364 372 ) ( -376 364 0 ) Grid/Dark/texture_01 0 0 0 1 1
+( -376 364 372 ) ( 104 364 372 ) ( 104 364 0 ) Grid/Dark/texture_01 0 0 0 1 1
+( 104 364 0 ) ( 104 368 0 ) ( -376 368 0 ) Grid/Dark/texture_01 0 0 0 1 1
+( -376 368 372 ) ( 104 368 372 ) ( 104 364 372 ) Grid/Dark/texture_01 0 0 0 1 1
+( 104 368 0 ) ( 104 368 372 ) ( -376 368 372 ) Grid/Dark/texture_01 0 0 0 1 1
+( 104 364 372 ) ( 104 368 372 ) ( 104 368 0 ) Grid/Dark/texture_01 0 0 0 1 1
+}
+// brush 2
+{
+( -268 308 200 ) ( -268 304 200 ) ( -268 304 0 ) Grid/Dark/texture_01 0 0 0 1 1
+( -268 304 200 ) ( 212 304 200 ) ( 212 304 0 ) Grid/Dark/texture_01 0 0 0 1 1
+( 212 304 0 ) ( 212 308 0 ) ( -268 308 0 ) Grid/Dark/texture_01 0 0 0 1 1
+( -268 308 200 ) ( 212 308 200 ) ( 212 304 200 ) Grid/Dark/texture_01 0 0 0 1 1
+( 212 308 0 ) ( 212 308 200 ) ( -268 308 200 ) Grid/Dark/texture_01 0 0 0 1 1
+( 212 304 200 ) ( 212 308 200 ) ( 212 308 0 ) Grid/Dark/texture_01 0 0 0 1 1
+}
+// brush 3
+{
+( -124 240 372 ) ( -124 236 372 ) ( -124 236 0 ) Grid/Dark/texture_01 0 0 0 1 1
+( -124 236 372 ) ( 356 236 372 ) ( 356 236 0 ) Grid/Dark/texture_01 0 0 0 1 1
+( 356 236 0 ) ( 356 240 0 ) ( -124 240 0 ) Grid/Dark/texture_01 0 0 0 1 1
+( -124 240 372 ) ( 356 240 372 ) ( 356 236 372 ) Grid/Dark/texture_01 0 0 0 1 1
+( 356 240 0 ) ( 356 240 372 ) ( -124 240 372 ) Grid/Dark/texture_01 0 0 0 1 1
+( 356 236 372 ) ( 356 240 372 ) ( 356 240 0 ) Grid/Dark/texture_01 0 0 0 1 1
+}
+// brush 4
+{
+( -360 -192 0 ) ( -128 -192 32 ) ( -128 -384 32 ) Grid/Dark/texture_01 0 0 0 1 1
+( -360 -384 0 ) ( -128 -384 32 ) ( -128 -384 0 ) Grid/Dark/texture_01 0 0 0 1 1
+( -128 -384 0 ) ( -128 -192 0 ) ( -360 -192 0 ) Grid/Dark/texture_01 0 0 0 1 1
+( -128 -192 0 ) ( -128 -192 32 ) ( -360 -192 0 ) Grid/Dark/texture_01 0 0 0 1 1
+( -128 -384 32 ) ( -128 -192 32 ) ( -128 -192 0 ) Grid/Dark/texture_01 0 0 0 1 1
+}
+// brush 5
+{
+( -128 -192 32 ) ( -128 -384 32 ) ( -128 -384 0 ) Grid/Dark/texture_01 0 0 180 1 -1
+( -128 -384 0 ) ( -128 -384 32 ) ( 104 -384 0 ) Grid/Dark/texture_01 0 -0.99999905 180 1 -1
+( -128 -192 0 ) ( -128 -384 0 ) ( 104 -384 0 ) Grid/Dark/texture_01 0 0 180 1 1
+( 104 -192 0 ) ( -128 -192 32 ) ( -128 -192 0 ) Grid/Dark/texture_01 0 -0.99999905 180 1 -1
+( 104 -384 0 ) ( -128 -384 32 ) ( -128 -192 32 ) Grid/Dark/texture_01 0 0 180 1 1
+}
+// brush 6
+{
+( 116 -72 84 ) ( 116 -8 80 ) ( 116 -8 84 ) Grid/Dark/texture_01 0 0 0 1 1
+( 180 -72 84 ) ( 116 -72 80 ) ( 116 -72 84 ) Grid/Dark/texture_01 0 0 0 1 1
+( 180 -8 80 ) ( 116 -72 80 ) ( 180 -72 80 ) Grid/Dark/texture_01 0 0 0 1 1
+( 180 -8 84 ) ( 116 -72 84 ) ( 116 -8 84 ) Grid/Dark/texture_01 0 0 0 1 1
+( 180 -8 84 ) ( 116 -8 80 ) ( 180 -8 80 ) Grid/Dark/texture_01 0 0 0 1 1
+( 180 -8 84 ) ( 180 -72 80 ) ( 180 -72 84 ) Grid/Dark/texture_01 0 0 0 1 1
+}
+// brush 7
+{
+( 56 12 44 ) ( 56 76 40 ) ( 56 76 44 ) Grid/Dark/texture_01 0 0 0 1 1
+( 120 12 44 ) ( 56 12 40 ) ( 56 12 44 ) Grid/Dark/texture_01 0 0 0 1 1
+( 120 76 40 ) ( 56 12 40 ) ( 120 12 40 ) Grid/Dark/texture_01 0 0 0 1 1
+( 120 76 44 ) ( 56 12 44 ) ( 56 76 44 ) Grid/Dark/texture_01 0 0 0 1 1
+( 120 76 44 ) ( 56 76 40 ) ( 120 76 40 ) Grid/Dark/texture_01 0 0 0 1 1
+( 120 76 44 ) ( 120 12 40 ) ( 120 12 44 ) Grid/Dark/texture_01 0 0 0 1 1
+}
+}

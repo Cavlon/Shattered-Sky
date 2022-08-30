@@ -8,15 +8,247 @@
 
 config_version=4
 
+_global_script_classes=[ {
+"base": "Reference",
+"class": "AreaMapData",
+"language": "GDScript",
+"path": "res://addons/world_edtior/resource/AreaMapData.gd"
+}, {
+"base": "Reference",
+"class": "ChapterMapData",
+"language": "GDScript",
+"path": "res://addons/world_edtior/resource/ChapterMapData.gd"
+}, {
+"base": "Reference",
+"class": "LavaLayer",
+"language": "GDScript",
+"path": "res://addons/qodot/game_definitions/worldspawn_layers/liquid/lava.gd"
+}, {
+"base": "Reference",
+"class": "LiquidLayer",
+"language": "GDScript",
+"path": "res://addons/qodot/game_definitions/worldspawn_layers/liquid.gd"
+}, {
+"base": "Reference",
+"class": "OrbitArm",
+"language": "GDScript",
+"path": "res://addons/qodot/example_scenes/2-miscallaneous/1-runtime-map-building/orbit_arm.gd"
+}, {
+"base": "Reference",
+"class": "PhysicsBall",
+"language": "GDScript",
+"path": "res://addons/qodot/game_definitions/fgd/point_classes/physics_ball.gd"
+}, {
+"base": "Reference",
+"class": "PhysicsEntity",
+"language": "GDScript",
+"path": "res://addons/qodot/game_definitions/fgd/solid_classes/physics.gd"
+}, {
+"base": "Reference",
+"class": "QodotDependencies",
+"language": "GDScript",
+"path": "res://addons/qodot/src/util/qodot_dependencies.gd"
+}, {
+"base": "QodotSpatial",
+"class": "QodotEntity",
+"language": "GDScript",
+"path": "res://addons/qodot/src/nodes/qodot_entity.gd"
+}, {
+"base": "Reference",
+"class": "QodotFGDBaseClass",
+"language": "GDScript",
+"path": "res://addons/qodot/src/resources/game-definitions/fgd/qodot_fgd_base_class.gd"
+}, {
+"base": "Resource",
+"class": "QodotFGDClass",
+"language": "GDScript",
+"path": "res://addons/qodot/src/resources/game-definitions/fgd/qodot_fgd_class.gd"
+}, {
+"base": "Reference",
+"class": "QodotFGDFile",
+"language": "GDScript",
+"path": "res://addons/qodot/src/resources/game-definitions/fgd/qodot_fgd_file.gd"
+}, {
+"base": "Reference",
+"class": "QodotFGDPointClass",
+"language": "GDScript",
+"path": "res://addons/qodot/src/resources/game-definitions/fgd/qodot_fgd_point_class.gd"
+}, {
+"base": "Reference",
+"class": "QodotFGDSolidClass",
+"language": "GDScript",
+"path": "res://addons/qodot/src/resources/game-definitions/fgd/qodot_fgd_solid_class.gd"
+}, {
+"base": "Reference",
+"class": "QodotLight",
+"language": "GDScript",
+"path": "res://addons/qodot/game_definitions/fgd/point_classes/light.gd"
+}, {
+"base": "QodotSpatial",
+"class": "QodotMap",
+"language": "GDScript",
+"path": "res://addons/qodot/src/nodes/qodot_map.gd"
+}, {
+"base": "Reference",
+"class": "QodotPlugin",
+"language": "GDScript",
+"path": "res://addons/qodot/src/qodot_plugin.gd"
+}, {
+"base": "Reference",
+"class": "QodotRotateEntity",
+"language": "GDScript",
+"path": "res://addons/qodot/game_definitions/fgd/solid_classes/rotate.gd"
+}, {
+"base": "Spatial",
+"class": "QodotSpatial",
+"language": "GDScript",
+"path": "res://addons/qodot/src/nodes/qodot_spatial.gd"
+}, {
+"base": "Reference",
+"class": "QodotTextureLoader",
+"language": "GDScript",
+"path": "res://addons/qodot/src/util/qodot_texture_loader.gd"
+}, {
+"base": "Reference",
+"class": "QodotUtil",
+"language": "GDScript",
+"path": "res://addons/qodot/src/util/qodot_util.gd"
+}, {
+"base": "Resource",
+"class": "QodotWorldspawnLayer",
+"language": "GDScript",
+"path": "res://addons/qodot/src/resources/worldspawn_layer.gd"
+}, {
+"base": "Resource",
+"class": "QuakeMapFile",
+"language": "GDScript",
+"path": "res://addons/qodot/src/resources/quake_map_file.gd"
+}, {
+"base": "EditorImportPlugin",
+"class": "QuakeMapImportPlugin",
+"language": "GDScript",
+"path": "res://addons/qodot/src/import_plugins/quake_map_import_plugin.gd"
+}, {
+"base": "Resource",
+"class": "QuakePaletteFile",
+"language": "GDScript",
+"path": "res://addons/qodot/src/resources/quake_palette_file.gd"
+}, {
+"base": "EditorImportPlugin",
+"class": "QuakePaletteImportPlugin",
+"language": "GDScript",
+"path": "res://addons/qodot/src/import_plugins/quake_palette_import_plugin.gd"
+}, {
+"base": "Resource",
+"class": "QuakeWadFile",
+"language": "GDScript",
+"path": "res://addons/qodot/src/resources/quake_wad_file.gd"
+}, {
+"base": "EditorImportPlugin",
+"class": "QuakeWadImportPlugin",
+"language": "GDScript",
+"path": "res://addons/qodot/src/import_plugins/quake_wad_import_plugin.gd"
+}, {
+"base": "Reference",
+"class": "RoomMapConfig",
+"language": "GDScript",
+"path": "res://addons/world_edtior/resource/RoomMapConfig.gd"
+}, {
+"base": "Reference",
+"class": "SlimeLayer",
+"language": "GDScript",
+"path": "res://addons/qodot/game_definitions/worldspawn_layers/liquid/slime.gd"
+}, {
+"base": "Reference",
+"class": "TrenchBroomFaceAttrib",
+"language": "GDScript",
+"path": "res://addons/qodot/src/resources/game-definitions/trenchbroom/trenchbroom_face_attrib.gd"
+}, {
+"base": "Resource",
+"class": "TrenchBroomFaceAttribDefaults",
+"language": "GDScript",
+"path": "res://addons/qodot/src/resources/game-definitions/trenchbroom/trenchbroom_face_attrib_defaults.gd"
+}, {
+"base": "Reference",
+"class": "TrenchBroomGameConfigFile",
+"language": "GDScript",
+"path": "res://addons/qodot/src/resources/game-definitions/trenchbroom/trenchbroom_game_config_file.gd"
+}, {
+"base": "Reference",
+"class": "TrenchBroomGameConfigFolder",
+"language": "GDScript",
+"path": "res://addons/qodot/src/resources/game-definitions/trenchbroom/trenchbroom_game_config_folder.gd"
+}, {
+"base": "Reference",
+"class": "TrenchBroomTag",
+"language": "GDScript",
+"path": "res://addons/qodot/src/resources/game-definitions/trenchbroom/trenchbroom_tag.gd"
+}, {
+"base": "Reference",
+"class": "WaterLayer",
+"language": "GDScript",
+"path": "res://addons/qodot/game_definitions/worldspawn_layers/liquid/water.gd"
+}, {
+"base": "Reference",
+"class": "WorldEditorPropertyHelper",
+"language": "GDScript",
+"path": "res://addons/world_edtior/common/WorldEditorPropertyHelper.gd"
+} ]
+_global_script_class_icons={
+"AreaMapData": "",
+"ChapterMapData": "",
+"LavaLayer": "",
+"LiquidLayer": "",
+"OrbitArm": "",
+"PhysicsBall": "",
+"PhysicsEntity": "",
+"QodotDependencies": "",
+"QodotEntity": "",
+"QodotFGDBaseClass": "",
+"QodotFGDClass": "",
+"QodotFGDFile": "",
+"QodotFGDPointClass": "",
+"QodotFGDSolidClass": "",
+"QodotLight": "",
+"QodotMap": "",
+"QodotPlugin": "",
+"QodotRotateEntity": "",
+"QodotSpatial": "res://addons/qodot/icons/icon_qodot_spatial.svg",
+"QodotTextureLoader": "",
+"QodotUtil": "",
+"QodotWorldspawnLayer": "",
+"QuakeMapFile": "",
+"QuakeMapImportPlugin": "",
+"QuakePaletteFile": "",
+"QuakePaletteImportPlugin": "",
+"QuakeWadFile": "",
+"QuakeWadImportPlugin": "",
+"RoomMapConfig": "",
+"SlimeLayer": "",
+"TrenchBroomFaceAttrib": "",
+"TrenchBroomFaceAttribDefaults": "",
+"TrenchBroomGameConfigFile": "",
+"TrenchBroomGameConfigFolder": "",
+"TrenchBroomTag": "",
+"WaterLayer": "",
+"WorldEditorPropertyHelper": ""
+}
+
 [application]
 
 config/name="Shattered Sky"
-run/main_scene="res://Scenes/Main.tscn"
+run/main_scene="res://Scenes/DebugLevel2.tscn"
 config/icon="res://icon.png"
+
+[display]
+
+window/size/width=1920
+window/size/height=1080
+window/stretch/mode="viewport"
 
 [editor_plugins]
 
-enabled=PoolStringArray( "res://addons/InspectorHeaders/plugin.cfg" )
+enabled=PoolStringArray( "res://addons/qodot/plugin.cfg" )
 
 [input]
 
@@ -43,6 +275,16 @@ move_right={
 jump={
 "deadzone": 0.5,
 "events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":32,"physical_scancode":0,"unicode":0,"echo":false,"script":null)
+ ]
+}
+crouch={
+"deadzone": 0.5,
+"events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":16777238,"physical_scancode":0,"unicode":0,"echo":false,"script":null)
+ ]
+}
+dash={
+"deadzone": 0.5,
+"events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":16777237,"physical_scancode":0,"unicode":0,"echo":false,"script":null)
  ]
 }
 
