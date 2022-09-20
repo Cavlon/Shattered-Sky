@@ -1,0 +1,17 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=2]
+
+[sub_resource type="Shader" id=1]
+code = "shader_type spatial;
+
+uniform float alphaVal;
+uniform vec3 colour;
+
+void fragment(){
+	ALBEDO = vec3(colour.x, colour.y, colour.z);
+	ALPHA = alphaVal;
+}"
+
+[resource]
+shader = SubResource( 1 )
+shader_param/alphaVal = 0.0
+shader_param/colour = Vector3( 0, 0, 0 )

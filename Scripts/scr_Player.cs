@@ -4,7 +4,7 @@ using System.Collections.Generic;
 public class scr_Player : KinematicBody
 {
     //Movement
-    [Export] private float speed = 7f;
+    [Export] private float maxRunSpeed = 7f;
     [Export] private float maxSpeed = 80f;
     [Export] private float gravity = 9.8f;
     [Export] private float jumpForce = 5f;
@@ -13,11 +13,13 @@ public class scr_Player : KinematicBody
     [Export] private float dashForce = 5f;
     private Dictionary<string, float> accel_type = new Dictionary<string, float>();
     private Spatial head;
-    private Vector3 snap;
+    public Vector3 snap;
     private Vector3 velocity = new Vector3();
-    private Vector3 gravityVec = new Vector3();
-    private Vector3 additionalVel = new Vector3();
+    public Vector3 gravityVec = new Vector3();
+    public Vector3 additionalVel = new Vector3();
     private Vector3 movement = new Vector3();
+    private Vector3 groundNormal = new Vector3();
+    public Vector2 mag = new Vector2();
     private RayCast groundCheck;
     private bool airJump;
     private float accel;
@@ -36,8 +38,10 @@ public class scr_Player : KinematicBody
 
 
     //Sliding
+    [Export] float maxCrouchSpeed;
     private MeshInstance mesh;
     private CollisionShape collider;
+    private RayCast ceilingCheck;
 
 
     //Camera
@@ -50,6 +54,7 @@ public class scr_Player : KinematicBody
     private float fov;
     private Camera camera;
     private Camera weaponCam;
+    private Spatial weapon;
     private float camAccel = 40f;
     private float tilt;
 
@@ -58,12 +63,14 @@ public class scr_Player : KinematicBody
     [Export] private float gforceLevel2;
     [Export] private float gforceMax;
     [Export] private float gforceGain;
-    private float gforce;
+    public float gforce;
 
 
     [Signal]
     public delegate void UpdateBars(float speed, float gforce);
 
+    [Signal]
+    public delegate void Sliding();
 
     public override void _Ready()
     {
@@ -75,18 +82,24 @@ public class scr_Player : KinematicBody
         accel = accel_type["default"];
 
         head = GetNode<Spatial>("Head");
-        camera = GetNode<Spatial>("Head").GetChild<Camera>(0);
+        camera = head.GetChild<Camera>(0);
         weaponCam = camera.GetNode<ViewportContainer>("ViewportContainer").GetNode<Viewport>("Viewport").GetNode<Camera>("WeaponCamera");
+        weapon = head.GetNode<Spatial>("WeaponHolder");
 
         leftWallCheck = raycasts.GetNode<RayCast>("WallLeft");
         rightWallCheck = raycasts.GetNode<RayCast>("WallRight");
         minJumpHeightCheck = raycasts.GetNode<RayCast>("MinJump");
         groundCheck = raycasts.GetNode<RayCast>("GroundCheck");
+        ceilingCheck = raycasts.GetNode<RayCast>("CeilingCheck");
 
         mesh = GetNode<MeshInstance>("PlayerMesh");
         collider = GetNode<CollisionShape>("PlayerCollider");
 
-        Input.SetMouseMode(Input.MouseMode.Captured);
+        Control bars = (Control)GetNode<Control>("HUD").Get("bars");
+        Connect("UpdateBars", bars, "SetValues");
+        Connect("Sliding", weapon, "Sliding");
+
+        Input.MouseMode = Input.MouseModeEnum.Captured;
     }
 
     public override void _Input(InputEvent @event)
@@ -151,13 +164,25 @@ public class scr_Player : KinematicBody
             mesh.Mesh = capsMesh;
 
             CapsuleShape shape = (CapsuleShape)collider.Shape;
-            shape.Height = Mathf.Lerp(shape.Height, 4f, delta * 5f);
+            shape.Height = 4f;
             collider.Shape = shape;
 
             mesh.Translation = mesh.Translation.LinearInterpolate(Vector3.Zero, delta * 5f);
-            collider.Translation = mesh.Translation;
+            collider.Translation = Vector3.Zero;
 
             head.Translation = head.Translation.LinearInterpolate(new Vector3 (head.Translation.x, 2.1f, head.Translation.z), delta * 5f);
+
+            ceilingCheck.Translation = new Vector3(ceilingCheck.Translation.x, 2.9f, ceilingCheck.Translation.z);
+            ceilingCheck.CastTo = Vector3.Up * 0.35f;
+        }
+
+        if (Input.IsActionPressed("crouch") && state != MovementState.wallrunning){
+            state = MovementState.sliding;
+            Slide(delta);
+            EmitSignal("Sliding", true);
+        } else if (!Input.IsActionPressed("crouch") && state == MovementState.sliding && !ceilingCheck.IsColliding()){
+            state = MovementState.normal;
+            EmitSignal("Sliding", false);
         }
 
         weaponCam.GlobalTransform = camera.GlobalTransform;
@@ -166,29 +191,29 @@ public class scr_Player : KinematicBody
         //Release/capture the mouse if 'escape' is pressed
         if (Input.IsActionJustPressed("ui_cancel"))
         {
-            if (Input.GetMouseMode() == Input.MouseMode.Visible)
-                Input.SetMouseMode(Input.MouseMode.Captured);
+            if (Input.MouseMode == Input.MouseModeEnum.Visible)
+                Input.MouseMode = Input.MouseModeEnum.Captured;
             else
-                Input.SetMouseMode(Input.MouseMode.Visible);
+                Input.MouseMode = Input.MouseModeEnum.Visible;
         }   
     }
 
     public override void _PhysicsProcess(float delta)
     {  
         grounded = groundCheck.IsColliding();
-        Vector3 normal = groundCheck.GetCollisionNormal();
+        groundNormal = groundCheck.GetCollisionNormal();
+        float targetSpeed = (state == MovementState.sliding) ? maxCrouchSpeed : maxRunSpeed;
+
+        //Store the player's relative velocity
+        mag = FindRelativeVel(movement);
+
+        float speed = mag.Length();
 
         //Gather the player's inputs
 	    var forwardInput = Input.GetActionStrength("move_back") - Input.GetActionStrength("move_forward");
 	    var horizontalInput = Input.GetActionStrength("move_right") - Input.GetActionStrength("move_left");
 
         Vector2 input = new Vector2(horizontalInput, forwardInput);
-        if (state == MovementState.sliding){
-            input = Vector2.Zero;
-        }
-
-        //Store the player's relative velocity
-        Vector2 mag = FindRelativeVel(movement);
 
         //Reset the speed multipliers
         float speedMultiplierX = 1f;
@@ -197,26 +222,18 @@ public class scr_Player : KinematicBody
         //Ground check
         if (grounded) {
             airJump = true;
-            if (state == MovementState.normal) snap = -normal;         
+            if (state == MovementState.normal || state == MovementState.sliding) snap = -groundNormal;         
 		    accel = accel_type["default"];
-		    gravityVec = Vector3.Zero;
+            if (GetFloorNormal() != Vector3.Zero){
+                gravityVec = Vector3.Zero;
+            } else {
+                Gravity(delta);
+            }
         } else {
             snap = Vector3.Down;
 		    accel = accel_type["air"];
-            float grav = gravity;
-            if (state == MovementState.wallrunning) grav = wallRunGrav;
 
-            if (IsOnCeiling()){
-                additionalVel.y = 0;
-            }
-
-            //First decrease the additional velocity before adding additional gravity force
-            if (additionalVel.y > 0){
-                additionalVel += Vector3.Down * grav * delta;
-            } else if (gravityVec.y < 100) {
-                additionalVel = Vector3.Zero;
-                gravityVec += Vector3.Down * grav * delta;
-            }		   
+            Gravity(delta);	   
 
             //Set the air speed multipliers 
             if (state != MovementState.sliding){
@@ -224,7 +241,7 @@ public class scr_Player : KinematicBody
                 speedMultiplierZ = 1.75f;
             }   
 
-            if (Input.IsActionJustPressed("dash") && state == MovementState.normal && gforce >= 30){
+            if (Input.IsActionJustPressed("dash") && state == MovementState.normal && gforce >= 30 && input.Length() > 0){
                 if (input.x * mag.x < 0){
                     mag.x = 0;
                 }
@@ -239,18 +256,16 @@ public class scr_Player : KinematicBody
             }        
         }
 
-        Slide(normal, delta);
-
         //Check if the player jumps on the ground or mid-air
         if (Input.IsActionJustPressed("jump")) {
             if (grounded){
                 snap = Vector3.Zero;
                 if (state != MovementState.sliding){                   
-                    Jump(jumpForce, normal * jumpForce);
+                    Jump(jumpForce, groundNormal * jumpForce);
                 } else {
-                    Jump(jumpForce * 0.5f, normal * jumpForce * 0.6f);
+                    Jump(jumpForce * 0.5f, groundNormal * jumpForce * 0.6f);
                     Vector2 dir = new Vector2(velocity.x, velocity.z).Normalized();
-                    if (mag.Length() > 30 && gforce >= 10){
+                    if (speed > 30 && gforce >= 10){
                         additionalVel += new Vector3(dir.x, 0, dir.y) * jumpForce * 0.5f;
                         gforce -= 10;
                     }                                        
@@ -265,16 +280,16 @@ public class scr_Player : KinematicBody
         }
 
         //The player decelerates slower when going above top speed
-        if (mag.Length() > speed + 1){
-            accel *= 0.8f;
+        if (speed > maxRunSpeed + 1){
+            accel *= 0.5f;
             fov = highSpeedfov;  
-            if (gforce <= gforceLevel2 && mag.Length() > speed + 20f){
+            if (gforce <= gforceLevel2 && speed > maxRunSpeed + 20f){
                 gforce += gforceGain * delta * 1.5f;
             } else {
                 gforce += gforceGain * delta;
             }            
         } else {
-            if (mag.Length() > 30 && gforce <= gforceLevel1){
+            if (speed > 30 && gforce <= gforceLevel1){
                 gforce += gforceGain * delta;
             }
             fov = basefov;
@@ -282,7 +297,8 @@ public class scr_Player : KinematicBody
 
         //Add a counter movement if the player has a counter input
         Vector2 newAccel = CounterMovement(input, mag, delta);
-        if (state == MovementState.sliding){
+        if (state == MovementState.sliding && speed > maxCrouchSpeed + 0.5f){
+            input = Vector2.Zero;
             accel *= 0.1f;
             newAccel = new Vector2(accel, accel);
         }     
@@ -292,8 +308,8 @@ public class scr_Player : KinematicBody
         Vector2 inputNorm = input.Normalized();
 
         //Smoothly interpolate the velocity on each axis
-        magX = Mathf.Lerp(magX, inputNorm.x * speed, newAccel.x * delta * speedMultiplierX);
-        magY = Mathf.Lerp(magY, inputNorm.y * speed, newAccel.y * delta * speedMultiplierZ);
+        magX = Mathf.Lerp(magX, inputNorm.x * targetSpeed, newAccel.x * delta * speedMultiplierX);
+        magY = Mathf.Lerp(magY, inputNorm.y * targetSpeed, newAccel.y * delta * speedMultiplierZ);
 
         //Find the global velocity from the player's new relative velocity
         Vector2 newMag = new Vector2(magX, magY);
@@ -323,7 +339,7 @@ public class scr_Player : KinematicBody
 	
 	    MoveAndSlideWithSnap(movement, snap, Vector3.Up);
 
-        EmitSignal("UpdateBars", Mathf.Round(mag.Length()), gforce);
+        EmitSignal("UpdateBars", Mathf.Round(speed), gforce);
     }
 
     private void Jump(float vertForce, Vector3 normVec){
@@ -372,35 +388,55 @@ public class scr_Player : KinematicBody
         }
     }
 
-    private void Slide(Vector3 normal, float delta){
-        if (Input.IsActionPressed("crouch") && state != MovementState.wallrunning){
-            state = MovementState.sliding;
+    private void Slide(float delta){
+        state = MovementState.sliding;
+        ceilingCheck.Translation = new Vector3(ceilingCheck.Translation.x, -0.1f, ceilingCheck.Translation.z);
+        ceilingCheck.CastTo = Vector3.Up * 3.35f;
 
-            camera.Fov = Mathf.Lerp(camera.Fov, fov + additionalfov, fovChangeRate * delta);
+        camera.Fov = Mathf.Lerp(camera.Fov, fov + additionalfov, fovChangeRate * delta);
 
-            mesh.Translation = mesh.Translation.LinearInterpolate(new Vector3 (0f, -1.5f, 0f), delta * 5f);
+        mesh.Translation = mesh.Translation.LinearInterpolate(Vector3.Down * 1.5f, delta * 5f);           
 
-            CapsuleMesh capsMesh = (CapsuleMesh)mesh.Mesh;
-            capsMesh.MidHeight = Mathf.Lerp(capsMesh.MidHeight, 1f, delta * 6f);
-            mesh.Mesh = capsMesh;
+        CapsuleMesh capsMesh = (CapsuleMesh)mesh.Mesh;
+        capsMesh.MidHeight = Mathf.Lerp(capsMesh.MidHeight, 1f, delta * 6f);
+        mesh.Mesh = capsMesh;
 
-            CapsuleShape shape = (CapsuleShape)collider.Shape;
-            shape.Height = Mathf.Lerp(shape.Height, 1f, delta * 6f);
-            collider.Shape = shape;
+        CapsuleShape shape = (CapsuleShape)collider.Shape;
+        shape.Height = 1f;
+        collider.Shape = shape;
 
-            collider.Translation = mesh.Translation;
+        collider.Translation = Vector3.Down * 1.5f;
 
-            head.Translation = head.Translation.LinearInterpolate(new Vector3 (head.Translation.x, -1.2f, head.Translation.z), delta * 5f);
+        head.Translation = head.Translation.LinearInterpolate(new Vector3 (head.Translation.x, -1.2f, head.Translation.z), delta * 5f);
 
-            additionalVel += new Vector3(normal.x, 0, normal.z);
-        } else if (Input.IsActionJustReleased("crouch")){
-            state = MovementState.normal;           
+        additionalVel += new Vector3(groundNormal.x, 0, groundNormal.z);
+    }
+
+    private void Gravity(float delta){
+        float grav = gravity;
+        if (state == MovementState.wallrunning) grav = wallRunGrav;
+
+        if (additionalVel.y < 0){
+            gravityVec.y += additionalVel.y;
+            additionalVel.y = 0;
         }
+
+        if (IsOnCeiling()){
+            additionalVel.y = 0;
+        }
+
+        //First decrease the additional velocity before adding additional gravity force
+        if (additionalVel.y > 0){
+            additionalVel += Vector3.Down * grav * delta;
+        } else if (gravityVec.y > -100) {
+            additionalVel.y = 0;
+            gravityVec += Vector3.Down * grav * delta;
+        }	
     }
 
     private Vector2 CounterMovement(Vector2 input, Vector2 mag, float delta){
         Vector2 newAccel = new Vector2(accel, accel);
-        if (grounded){
+        if (grounded){            
             if (Mathf.Abs(mag.x) > threshold && Mathf.Abs(input.x) < 0.05f || (mag.x < -threshold && input.x > 0) || (mag.x > threshold && input.x < 0)){
                 newAccel.x = accel * 1.5f;
             }
@@ -425,7 +461,7 @@ public class scr_Player : KinematicBody
         return newAccel;
     }
 
-    private Vector2 FindRelativeVel(Vector3 linearVelocity){
+    public Vector2 FindRelativeVel(Vector3 linearVelocity){
 
         float lookAngle = Rotation.y;
 
@@ -433,7 +469,7 @@ public class scr_Player : KinematicBody
         return mag;
     }
 
-    private Vector2 FindVelFromMag(Vector2 mag){
+    public Vector2 FindVelFromMag(Vector2 mag){
 
         float lookAngle = -Rotation.y;
 

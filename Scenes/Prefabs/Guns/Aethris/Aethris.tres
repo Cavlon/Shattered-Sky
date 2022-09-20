@@ -1,0 +1,12 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://Scripts/scr_GunData.cs" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+name = "Aethris"
+damage = 50
+altDamage = 25
+shotDelay = 0.75
+altShotDelay = 2.0
+altGforceCost = 20

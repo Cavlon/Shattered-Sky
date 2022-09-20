@@ -1,0 +1,12 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://Scripts/scr_GunData.cs" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+name = "Velocitat"
+damage = 15
+altDamage = 10
+shotDelay = 0.25
+altShotDelay = 1.0
+altGforceCost = 10
